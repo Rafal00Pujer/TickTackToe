@@ -1,5 +1,88 @@
-﻿<h3>TickTackToeComponent</h3>
+﻿@page "/ticktacktoe"
+@rendermode InteractiveWebAssembly
+
+<PageTitle>
+    @Title
+</PageTitle>
+
+<div class="container">
+    <div class="row row-cols-1">
+        <div class="col text-center">
+            <h1>@Title</h1>
+        </div>
+    </div>
+
+    @for (var i = 0; i < board.GetLength(0); i++)
+    {
+        <div class="row justify-content-center">
+
+            @for (var j = 0; j < board.GetLength(1); j++)
+            {
+                var localI = i;
+                var localJ = j;
+
+                <div class="col-2 py-2 border border-5 d-flex align-items-center justify-content-center" style="width: 200px; height: 200px;" @onclick="()=>PlayerSetNode(localI, localJ)">
+
+                    @switch (board[localI, localJ])
+                    {
+                        case NodeType.Circle:
+
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-circle flex-fill" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                            </svg>
+
+                            break;
+
+                        case NodeType.Cross:
+
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
+                            </svg>
+
+                            break;
+                    }
+
+                </div>
+            }
+
+        </div>
+    }
+</div>
 
 @code {
+    const string Title = "Tick Tack Toe";
 
+    private NodeType[,] board = new NodeType[3, 3];
+
+    private async void PlayerSetNode(int i, int j)
+    {
+        board[i, j] = NodeType.Cross;
+
+        await ComputerSetNode();
+    }
+
+    private async Task ComputerSetNode()
+    {
+        await Task.Delay(200);
+
+        int i, j;
+
+        do
+        {
+            i = Random.Shared.Next(0, 3);
+            j = Random.Shared.Next(0, 3);
+
+        } while (board[i, j] != NodeType.Empty);
+
+        board[i, j] = NodeType.Circle;
+
+        StateHasChanged();
+    }
+
+    private enum NodeType
+    {
+        Empty,
+        Circle,
+        Cross
+    }
 }
